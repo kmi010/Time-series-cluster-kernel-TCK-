@@ -58,8 +58,11 @@ n0 = (0.2-0.001).*rand + 0.001;
 
 % Randomly subsample dimensions, time intervals and samples
 s = RandStream('mt19937ar','Seed',0);
-%sN = randi([round(minN*N),N]);
-sN = round(minN*N);
+if(N > 100)
+    sN = randi([round(minN*N),N]);
+else
+    sN = round(0.9*N);
+end
 sub_idx = sort(randperm(s,N,sN)); % generate sN (sorted) integers between 1 and N
 
 sV = randi([minV,maxV]);
@@ -95,7 +98,7 @@ if(missing == 1)
     T2 = repmat((1:sT),[sT,1]);
     for v=1:sV
         S_0(:,:,v) = s_0(v)*b0*exp(-a0*(T1-T2).^2);
-        if(rcond(S_0(:,:,v)) < 1e-10)  % check if the matrix can be inverted
+        if(rcond(S_0(:,:,v)) < 1e-8)  % check if the matrix can be inverted
             S_0(:,:,v) = S_0(:,:,v) + 0.1*S_0(1,1,v)*eye(sT);   %add a small number to the diagonal
         end
         invS_0(:,:,v) = inv(S_0(:,:,v));
@@ -168,7 +171,7 @@ elseif(missing == 0)
     T2 = repmat((1:sT),[sT,1]);
     for v=1:sV
         S_0(:,:,v) = s_0(v)*b0*exp(-a0*(T1-T2).^2);
-        if(rcond(S_0(:,:,v)) < 1e-10)  % check if the matrix can be inverted
+        if(rcond(S_0(:,:,v)) < 1e-8)  % check if the matrix can be inverted
             S_0(:,:,v) = S_0(:,:,v) + 0.1*S_0(1,1,v)*eye(sT);   %add a small number to the diagonal if S_0 is not invertible
         end
         invS_0(:,:,v) = inv(S_0(:,:,v));

@@ -9,14 +9,15 @@ load('xte_VAR.mat');
 Xte = reshape(xte,[200,50,2]);
 Yte = Y;
 
-C = 40;
-G = 30;
 
 % Train GMM models
-[GMMpar,C,G]  = trainTCK(X,'C',C,'G',G);
+[GMMpar,C,G]  = trainTCK(X);
 
-% Compute TCK kernel
-Kte = TCK(GMMpar,Xte,C,G);
+%Compute in-sample kernel matrix
+K = TCK(GMMpar,C,G);
+
+% Compute similarity between Xte and the training points
+Kte = TCK(GMMpar,C,G,Xte);
 
 % 1NN -classifier
 Nte = length(Yte);
