@@ -33,15 +33,19 @@ V = size(X,3); % number of variables in each time series
 
 % Parse the optional parameters
 p = inputParser();
-p.addParameter('C', 40, @(z) assert(z>=2, 'C must be larger than 1'));
+if(N < 100)
+    p.addParameter('C', 10, @(z) assert(z>=2, 'C must be larger than 1'));
+else
+    p.addParameter('C', 40, @(z) assert(z>=2, 'C must be larger than 1'));
+end
 p.addParameter('G', 30);
-p.addParameter('minN', 0.5, @(z) assert(z>0 && z<=1, 'The minimum percentage of subsample must be in (0,1]'));
+p.addParameter('minN', 0.8, @(z) assert(z>0 && z<=1, 'The minimum percentage of subsample must be in (0,1]'));
 if(V==1)
     p.addParameter('minV', 1, @(z) assert(z>=1 && z<=V, 'The minimum number of variables must be in [1,V]'));
 else
-    p.addParameter('minV', 1, @(z) assert(z>=1 && z<=V, 'The minimum number of variables must be in [1,V]'));
+    p.addParameter('minV', 2, @(z) assert(z>=1 && z<=V, 'The minimum number of variables must be in [1,V]'));
 end
-p.addParameter('maxV', min(ceil(0.9*V),20), @(z) assert(z>=1 && z<=V, 'The maximum number of variables must be in [1,V]'));
+p.addParameter('maxV', min(ceil(0.9*V),15), @(z) assert(z>=1 && z<=V, 'The maximum number of variables must be in [1,V]'));
 p.addParameter('minT', 6, @(z) assert(z>=1 && z<=T, 'The minimum length of time segments should be in [1,T]'));
 p.addParameter('maxT', min(floor(0.8*T),25), @(z) assert(z>=1 && z<=T, 'The maximum length of time segments should be in [1,T]'));
 p.addParameter('I', 20);
@@ -68,8 +72,7 @@ else
     fprintf('The dataset does not contain missing data\n\n');
 end
 
-fprintf(' Training the TCK using the following parameters:\n C = %d, G =%d\n Number of MTS for each GMM: %d (%d percent)\n Number of attributes sampled from [%d, %d]\n Length of time segments sampled from [%d, %d]\n\n', C, G, floor(minN*N), floor(minN*100), minV, maxV, minT, maxT);  
-%fprintf('Replication %d, Training time: %.3f Test time: %.4f seconds\n',repl,elapsedtr,elapsedtst/noftest);
+fprintf(' Training the TCK using the following parameters:\n C = %d, G =%d\n Number of MTS for each GMM: %d - %d (%d - 100 percent)\n Number of attributes sampled from [%d, %d]\n Length of time segments sampled from [%d, %d]\n\n', C, G, floor(minN*N), N, floor(minN*100), minV, maxV, minT, maxT);  
 
 parfor i=1:G*(C-1)
     c= floor((i-1)/G) + 2;
